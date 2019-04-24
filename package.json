@@ -1,0 +1,26 @@
+{
+  "name": "file-retriever",
+  "version": "1.0.0",
+  "description": "A service to get files from file system",
+  "main": "app.js",
+  "scripts": {
+    "test": "npm test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/vicente-nvt/file-retriever.git"
+  },
+  "author": "José Vicente Neto",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/vicente-nvt/file-retriever/issues"
+  },
+  "homepage": "https://github.com/vicente-nvt/file-retriever#readme",
+  "devDependencies": {
+    "eslint": "^5.16.0"
+  },
+  "dependencies": {
+    "body-parser": "^1.18.3",
+    "express": "^4.16.4"
+  }
+}

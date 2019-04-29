@@ -22,7 +22,6 @@
   "dependencies": {
     "body-parser": "^1.18.3",
     "consign": "^0.1.6",
-    "express": "^4.16.4",
-    "express-fileupload": "^1.1.4"
+    "express": "^4.16.4"
   }
 }

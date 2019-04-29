@@ -1,14 +1,13 @@
+var FileController = require('../controllers/files')
+
 module.exports = (app) => {
+	let fileController = new FileController()
 
 	app.get('/files/*', (req, res) => {
-		let path = req.path
-		let fileAddress = path.replace('/files/', '')
-		res.download(fileAddress)
+		fileController.getFile(req, res)
 	})
 
 	app.post('/files/*', (req, res) => {
-		console.log(req.files)
-		res.sendStatus(200)
+		fileController.saveFile(req, res)
 	})
-
 }

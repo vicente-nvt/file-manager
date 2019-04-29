@@ -8,6 +8,10 @@ module.exports = (app) => {
 	})
 
 	app.post('/files/*', (req, res) => {
-		fileController.saveFile(req, res)
+		fileController.createFile(req, res)
+	})
+
+	app.put('/files/*', (req, res) => {
+		fileController.overwriteFile(req, res)
 	})
 }

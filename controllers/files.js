@@ -1,21 +1,6 @@
 var FileManager = require('../service/file-manager')
 
-function getFileAddress(req) {
-	let path = req.path
-	let fileAddress = path.replace('/files/', '')
-	fileAddress = fileAddress.replace(new RegExp('%20', 'g'), ' ')
-	return fileAddress
-}
-
-function dealWithError(res, error) {
-	switch (error.code) {
-		case 'ENOENT': res.sendStatus(404); break
-		case 'EEXIST': res.sendStatus(409); break
-		default: res.status(500).send(error.code)
-	}
-}
-
-class FileController {
+module.exports = class FileController {
 
 	constructor() {
 		this.fileManager = new FileManager()
@@ -53,4 +38,17 @@ class FileController {
 	}
 }
 
-module.exports = FileController
+function getFileAddress(req) {
+	let path = req.path
+	let fileAddress = path.replace('/files/', '')
+	fileAddress = fileAddress.replace(new RegExp('%20', 'g'), ' ')
+	return fileAddress
+}
+
+function dealWithError(res, error) {
+	switch (error.code) {
+		case 'ENOENT': res.sendStatus(404); break
+		case 'EEXIST': res.sendStatus(409); break
+		default: res.status(500).send(error.code)
+	}
+}

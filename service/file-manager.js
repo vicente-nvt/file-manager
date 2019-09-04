@@ -1,15 +1,6 @@
 var fs = require('fs')
 
-function writeFile(fileAddress, fileContent, flag) {
-	return new Promise((resolve, reject) => {
-		fs.writeFileSync(fileAddress, fileContent, { flag: flag }, (error) => {
-			reject(error)
-		})
-		resolve()
-	})
-}
-
-class FileManager {
+module.exports = class FileManager {
 
 	overwriteFile(fileAddress, fileContent) {
 		return writeFile(fileAddress, fileContent, 'w')
@@ -29,4 +20,11 @@ class FileManager {
 	}
 }
 
-module.exports = FileManager
+function writeFile(fileAddress, fileContent, flag) {
+	return new Promise((resolve, reject) => {
+		fs.writeFileSync(fileAddress, fileContent, { flag: flag }, (error) => {
+			reject(error)
+		})
+		resolve()
+	})
+}

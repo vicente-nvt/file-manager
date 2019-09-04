@@ -18,11 +18,22 @@ module.exports = class FileManager {
 			resolve()
 		})
 	}
+
+	deleteFile(filePath) {
+		return new Promise((resolve, reject) => {
+			fs.unlinkSync(filePath, (error) => {
+				reject(error)
+			})
+			resolve()
+		})
+	}
 }
 
 function writeFile(fileAddress, fileContent, flag) {
 	return new Promise((resolve, reject) => {
-		fs.writeFileSync(fileAddress, fileContent, { flag: flag }, (error) => {
+		fs.writeFileSync(fileAddress, fileContent, {
+			flag: flag
+		}, (error) => {
 			reject(error)
 		})
 		resolve()

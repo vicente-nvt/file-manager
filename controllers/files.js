@@ -1,4 +1,5 @@
-var FileManager = require('../service/file-manager')
+let FileManager = require('../service/file-manager')
+let statusCode = require('./status-code')
 
 module.exports = class FileController {
 
@@ -21,7 +22,7 @@ module.exports = class FileController {
 		this.fileManager.createPathIfDoesntExist(filePath)
 			.then(() => {
 				this.fileManager.writeFile(fileAddress, req.body)
-					.then(() => res.sendStatus(201))
+					.then(() => res.sendStatus(statusCode.CREATED))
 					.catch((error) => dealWithError(res, error))
 			})
 			.catch((error) => {
@@ -33,8 +34,15 @@ module.exports = class FileController {
 	overwriteFile(req, res) {
 		let fileAddress = getFileAddress(req)
 		this.fileManager.overwriteFile(fileAddress, req.body)
-			.then(() => res.sendStatus(204))
+			.then(() => res.sendStatus(statusCode.NO_CONTENT))
 			.catch((error) => dealWithError(res, error))
+	}
+
+	deleteFile(req, res) {
+		let fileAddress = getFileAddress(req)
+		this.fileManager.deleteFile(fileAddress)
+			.then(() => res.sendStatus(statusCode.OK))
+			.catch((error) =>  dealWithError(res, error))
 	}
 }
 
@@ -47,8 +55,8 @@ function getFileAddress(req) {
 
 function dealWithError(res, error) {
 	switch (error.code) {
-		case 'ENOENT': res.sendStatus(404); break
-		case 'EEXIST': res.sendStatus(409); break
-		default: res.status(500).send(error.code)
+		case 'ENOENT': res.sendStatus(statusCode.NOT_FOUND); break
+		case 'EEXIST': res.sendStatus(statusCode.CONFLICT); break
+		default: res.status(statusCode.SERVER_ERROR).send(error.code)
 	}
 }

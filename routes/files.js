@@ -14,4 +14,8 @@ module.exports = (app) => {
 	app.put('/files/*', (req, res) => {
 		fileController.overwriteFile(req, res)
 	})
+
+	app.delete('/files/*', (req, res) => {
+		fileController.deleteFile(req, res)
+	})
 }

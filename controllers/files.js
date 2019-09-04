@@ -1,42 +1,28 @@
-var fs = require('fs')
+var FileManager = require('../service/file-manager')
 
 function getFileAddress(req) {
 	let path = req.path
 	let fileAddress = path.replace('/files/', '')
+	fileAddress = fileAddress.replace(new RegExp('%20', 'g'), ' ')
 	return fileAddress
-}
-
-function writeFile(fileAddress, fileContent, flag) {
-	return new Promise((resolve, reject) => {
-		fs.writeFileSync(fileAddress, fileContent, { flag: flag }, (error) => {
-			reject(error)
-		})
-		resolve()
-	})
-}
-
-function createPathIfDoesntExist(filePath) {
-	return new Promise((resolve, reject) => {
-		fs.mkdirSync(filePath, { recursive: true }, (error) => {
-			reject(error)
-		})
-		resolve()
-	})
 }
 
 function dealWithError(res, error) {
 	switch (error.code) {
-	case 'ENOENT': res.sendStatus(404); break
-	case 'EEXIST': res.sendStatus(409); break
-	default: res.status(500).send(error.code)
+		case 'ENOENT': res.sendStatus(404); break
+		case 'EEXIST': res.sendStatus(409); break
+		default: res.status(500).send(error.code)
 	}
 }
 
 class FileController {
 
+	constructor() {
+		this.fileManager = new FileManager()
+	}
+
 	getFile(req, res) {
-		let path = req.path
-		let fileAddress = path.replace('/files/', '')
+		let fileAddress = getFileAddress(req)
 		res.download(fileAddress)
 	}
 
@@ -47,9 +33,9 @@ class FileController {
 		let fileName = pathThree[pathThree.length - 1]
 		let filePath = fileAddress.replace(fileName, '')
 
-		createPathIfDoesntExist(filePath)
+		this.fileManager.createPathIfDoesntExist(filePath)
 			.then(() => {
-				writeFile(fileAddress, req.body, 'ax')
+				this.fileManager.writeFile(fileAddress, req.body)
 					.then(() => res.sendStatus(201))
 					.catch((error) => dealWithError(res, error))
 			})
@@ -61,11 +47,10 @@ class FileController {
 
 	overwriteFile(req, res) {
 		let fileAddress = getFileAddress(req)
-		writeFile(fileAddress, req.body, 'a')
+		this.fileManager.overwriteFile(fileAddress, req.body)
 			.then(() => res.sendStatus(204))
 			.catch((error) => dealWithError(res, error))
 	}
-
 }
 
 module.exports = FileController

@@ -14,10 +14,7 @@ module.exports = class FileController {
 
 	createFile(req, res) {
 		let fileAddress = getFileAddress(req)
-
-		let pathThree = fileAddress.split('/')
-		let fileName = pathThree[pathThree.length - 1]
-		let filePath = fileAddress.replace(fileName, '')
+		let filePath = getFilePath(fileAddress)
 
 		this.fileManager.createPathIfDoesntExist(filePath)
 			.then(() => {
@@ -27,7 +24,6 @@ module.exports = class FileController {
 			})
 			.catch((error) => {
 				dealWithError(res, error)
-				return
 			})
 	}
 
@@ -42,15 +38,36 @@ module.exports = class FileController {
 		let fileAddress = getFileAddress(req)
 		this.fileManager.deleteFile(fileAddress)
 			.then(() => res.sendStatus(statusCode.OK))
-			.catch((error) =>  dealWithError(res, error))
+			.catch((error) => dealWithError(res, error))
+	}
+
+	moveFile(req, res) {
+		let address = JSON.parse(req.body.toString())
+		let newFilePath = getFilePath(address.to)
+
+		this.fileManager.createPathIfDoesntExist(newFilePath)
+			.then(() => {
+				this.fileManager.moveFile(address.from, address.to)
+					.then(() => res.send(statusCode.NO_CONTENT))
+					.catch((error) => dealWithError(res, error))
+			})
+			.catch((error) => dealWithError(res, error))
 	}
 }
 
 function getFileAddress(req) {
 	let path = req.path
 	let fileAddress = path.replace('/files/', '')
+	fileAddress = decodeURIComponent(fileAddress)
 	fileAddress = fileAddress.replace(new RegExp('%20', 'g'), ' ')
 	return fileAddress
+}
+
+function getFilePath(fileAddress) {
+	let pathThree = fileAddress.split('/')
+	let fileName = pathThree[pathThree.length - 1]
+	let filePath = fileAddress.replace(fileName, '')
+	return filePath
 }
 
 function dealWithError(res, error) {

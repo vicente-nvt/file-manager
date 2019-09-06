@@ -18,4 +18,8 @@ module.exports = (app) => {
 	app.delete('/files/*', (req, res) => {
 		fileController.deleteFile(req, res)
 	})
+
+	app.patch('/files/move', (req, res) => {
+		fileController.moveFile(req, res)
+	})
 }

@@ -13,7 +13,7 @@ app.use(bodyParser.urlencoded({ extended: true }))
 app.use(databaseConnection.checkConnection)
 
 consign()
-	.include('./routes')
-	.into(app)
+    .include('./routes')
+    .into(app)
 
 module.exports = app

@@ -3,30 +3,30 @@ var config = require('./config')
 var HttpStatus = require('http-status-codes')
 
 let checkToken = (req, res, next) => {
-	let token = req.headers['x-access-token'] || req.headers['authorization']
+    let token = req.headers['x-access-token'] || req.headers['authorization']
 
-	if (!token) {
-		return sendUnauthorized(res)
-	}
+    if (!token) {
+        return sendUnauthorized(res)
+    }
 
-	if (token.startsWith('Bearer '))
-		token = token.slice(7, token.length)
+    if (token.startsWith('Bearer '))
+        token = token.slice(7, token.length)
 
-	let tokenValidated = TokenValidation.validate(token, config.secretKey)
+    let tokenValidated = TokenValidation.validate(token, config.secretKey)
 
-	if (!tokenValidated.valid) {
-		return sendUnauthorized(res)
-	}
+    if (!tokenValidated.valid) {
+        return sendUnauthorized(res)
+    }
 
-	req.decodedToken = tokenValidated.decodedToken
+    req.decodedToken = tokenValidated.decodedToken
 
-	next()
+    next()
 }
 
 function sendUnauthorized(res) {
-	res.sendStatus(HttpStatus.UNAUTHORIZED)
+    res.sendStatus(HttpStatus.UNAUTHORIZED)
 }
 
 module.exports = {
-	checkToken: checkToken
+    checkToken: checkToken
 }

@@ -12,7 +12,7 @@ module.exports = class UserHandler {
             .then((user) => {
                 let hash = crypto.createHmac('sha256', this.salt)
                 let hashedPassword = hash.update(password).digest('hex')
-		
+
                 return user.checkPassword(hashedPassword)
             })
             .catch(() => {

@@ -6,8 +6,8 @@ let config = require('../infra/config')
 
 module.exports = class LoginController {
 
-	constructor() {
-		let userRepository = new UserRepository()
+	constructor(databaseConnection) {
+		let userRepository = new UserRepository(databaseConnection)
 		this.userHandler = new UserHandler(userRepository, config.salt)
 	}
 
@@ -24,16 +24,20 @@ module.exports = class LoginController {
 			return sendBadRequest(res)
 		}
 
-		let loginIsValid = this.userHandler.validateUser(loginData.usr, loginData.pwd)
+		this.userHandler.validateUser(loginData.usr, loginData.pwd)
+			.then((loginIsValid) => {
+				if (!loginIsValid) {
+					res.sendStatus(HttpStatus.FORBIDDEN)
+					return
+				}
 
-		if (!loginIsValid) {
-			res.sendStatus(HttpStatus.FORBIDDEN)
-			return
-		}
+				let token = TokenGeneration.generate(loginData.usr, config.secretKey)
 
-		let token = TokenGeneration.generate(loginData.usr, config.secretKey)
-
-		res.status(HttpStatus.OK).send({token: token})
+				res.status(HttpStatus.OK).send({token: token})
+			})
+			.catch((error) => {
+				res.status(HttpStatus.INTERNAL_SERVER_ERROR).send(error)
+			})
 	}
 }
 

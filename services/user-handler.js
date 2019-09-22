@@ -8,11 +8,15 @@ module.exports = class UserHandler {
 	}
 
 	validateUser(username, password) {
-		let user = this.userRepository.findByUserName(username)
+		return this.userRepository.findByUserName(username)
+			.then((user) => {
+				let hash = crypto.createHmac('sha256', this.salt)
+				let hashedPassword = hash.update(password).digest('hex')
 		
-		let hash = crypto.createHmac('sha256', this.salt)
-		let hashedPassword = hash.update(password).digest('hex')
-
-		return user.checkPassword(hashedPassword)
+				return user.checkPassword(hashedPassword)
+			})
+			.catch(() => {
+				return false
+			})
 	}
 }

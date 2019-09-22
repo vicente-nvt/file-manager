@@ -1,7 +1,12 @@
 var FileController = require('../controllers/files')
+var tokenMiddleware = require('../infra/token-middleware')
 
 module.exports = (app) => {
 	let fileController = new FileController()
+
+	app.all('/files/*', tokenMiddleware.checkToken, (req, res, next) => {
+		next()
+	})
 
 	app.get('/files/*', (req, res) => {
 		fileController.getFile(req, res)

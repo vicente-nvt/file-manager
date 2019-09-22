@@ -1,5 +1,5 @@
-let FileManager = require('../service/file-manager')
-let statusCode = require('./status-code')
+let FileManager = require('../services/file-manager')
+let HttpStatus = require('http-status-codes')
 
 module.exports = class FileController {
 
@@ -19,7 +19,7 @@ module.exports = class FileController {
 		this.fileManager.createPathIfDoesntExist(filePath)
 			.then(() => {
 				this.fileManager.writeFile(fileAddress, req.body)
-					.then(() => res.sendStatus(statusCode.CREATED))
+					.then(() => res.sendStatus(HttpStatus.CREATED))
 					.catch((error) => dealWithError(res, error))
 			})
 			.catch((error) => {
@@ -30,25 +30,32 @@ module.exports = class FileController {
 	overwriteFile(req, res) {
 		let fileAddress = getFileAddress(req)
 		this.fileManager.overwriteFile(fileAddress, req.body)
-			.then(() => res.sendStatus(statusCode.NO_CONTENT))
+			.then(() => res.sendStatus(HttpStatus.NO_CONTENT))
 			.catch((error) => dealWithError(res, error))
 	}
 
 	deleteFile(req, res) {
 		let fileAddress = getFileAddress(req)
 		this.fileManager.deleteFile(fileAddress)
-			.then(() => res.sendStatus(statusCode.OK))
+			.then(() => res.sendStatus(HttpStatus.OK))
 			.catch((error) => dealWithError(res, error))
 	}
 
 	moveFile(req, res) {
-		let address = JSON.parse(req.body.toString())
+		let address
+		try {
+			address = JSON.parse(req.body.toString())
+		} catch (exception) {
+			res.send(HttpStatus.BAD_REQUEST)
+			return
+		}
+
 		let newFilePath = getFilePath(address.to)
 
 		this.fileManager.createPathIfDoesntExist(newFilePath)
 			.then(() => {
 				this.fileManager.moveFile(address.from, address.to)
-					.then(() => res.send(statusCode.NO_CONTENT))
+					.then(() => res.send(HttpStatus.NO_CONTENT))
 					.catch((error) => dealWithError(res, error))
 			})
 			.catch((error) => dealWithError(res, error))
@@ -57,7 +64,8 @@ module.exports = class FileController {
 
 function getFileAddress(req) {
 	let path = req.path
-	let fileAddress = path.replace('/files/', '')
+	let username = req.decodedToken.username
+	let fileAddress = path.replace('/files/', `${username}/`)
 	fileAddress = decodeURIComponent(fileAddress)
 	fileAddress = fileAddress.replace(new RegExp('%20', 'g'), ' ')
 	return fileAddress
@@ -72,8 +80,8 @@ function getFilePath(fileAddress) {
 
 function dealWithError(res, error) {
 	switch (error.code) {
-		case 'ENOENT': res.sendStatus(statusCode.NOT_FOUND); break
-		case 'EEXIST': res.sendStatus(statusCode.CONFLICT); break
-		default: res.status(statusCode.SERVER_ERROR).send(error.code)
+		case 'ENOENT': res.sendStatus(HttpStatus.NOT_FOUND); break
+		case 'EEXIST': res.sendStatus(HttpStatus.CONFLICT); break
+		default: res.status(HttpStatus.SERVER_ERROR).send(error.code)
 	}
 }

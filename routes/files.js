@@ -9,22 +9,22 @@ module.exports = (app) => {
     })
 
     app.get('/files/*', (req, res) => {
-        fileController.getFile(req, res)
+        return fileController.getFile(req, res)
     })
 
     app.post('/files/*', (req, res) => {
-        fileController.createFile(req, res)
+        return fileController.createFile(req, res)
     })
 
     app.put('/files/*', (req, res) => {
-        fileController.overwriteFile(req, res)
+        return fileController.overwriteFile(req, res)
     })
 
     app.delete('/files/*', (req, res) => {
-        fileController.deleteFile(req, res)
+        return fileController.deleteFile(req, res)
     })
 
     app.patch('/files/move', (req, res) => {
-        fileController.moveFile(req, res)
+        return fileController.moveFile(req, res)
     })
 }

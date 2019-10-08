@@ -24,7 +24,7 @@ module.exports = class LoginController {
             return sendBadRequest(res)
         }
 
-        this.userHandler.validateUser(loginData.usr, loginData.pwd)
+        return this.userHandler.validateUser(loginData.usr, loginData.pwd)
             .then((loginIsValid) => {
                 if (!loginIsValid) {
                     res.sendStatus(HttpStatus.FORBIDDEN)

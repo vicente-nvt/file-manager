@@ -8,7 +8,7 @@ class DatabaseConnection {
     }
 
     connectDatabase() {
-        return this.database.connect(this.databaseConnectionString, { useNewUrlParser: true })
+        return this.database.connect(this.databaseConnectionString, { useNewUrlParser: true, useUnifiedTopology: true, })
     }
 
     checkConnection() {

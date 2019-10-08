@@ -9,14 +9,14 @@ module.exports = class FileController {
 
     getFile(req, res) {
         let fileAddress = getFileAddress(req)
-        res.download(fileAddress)
+        return res.download(fileAddress)
     }
 
     createFile(req, res) {
         let fileAddress = getFileAddress(req)
         let filePath = getFilePath(fileAddress)
 
-        this.fileManager.createPathIfDoesntExist(filePath)
+        return this.fileManager.createPathIfDoesntExist(filePath)
             .then(() => {
                 this.fileManager.writeFile(fileAddress, req.body)
                     .then(() => res.sendStatus(HttpStatus.CREATED))
@@ -29,14 +29,14 @@ module.exports = class FileController {
 
     overwriteFile(req, res) {
         let fileAddress = getFileAddress(req)
-        this.fileManager.overwriteFile(fileAddress, req.body)
+        return this.fileManager.overwriteFile(fileAddress, req.body)
             .then(() => res.sendStatus(HttpStatus.NO_CONTENT))
             .catch((error) => dealWithError(res, error))
     }
 
     deleteFile(req, res) {
         let fileAddress = getFileAddress(req)
-        this.fileManager.deleteFile(fileAddress)
+        return this.fileManager.deleteFile(fileAddress)
             .then(() => res.sendStatus(HttpStatus.OK))
             .catch((error) => dealWithError(res, error))
     }
@@ -50,15 +50,23 @@ module.exports = class FileController {
             return
         }
 
-        let newFilePath = getFilePath(address.to)
+        let { from, to } = getPathsInUserFolder(req.decodedToken.username, address)
+        let newFilePath = getFilePath(to)
 
-        this.fileManager.createPathIfDoesntExist(newFilePath)
+        return this.fileManager.createPathIfDoesntExist(newFilePath)
             .then(() => {
-                this.fileManager.moveFile(address.from, address.to)
-                    .then(() => res.send(HttpStatus.NO_CONTENT))
+                this.fileManager.moveFile(from, to)
+                    .then(() => res.sendStatus(HttpStatus.NO_CONTENT))
                     .catch((error) => dealWithError(res, error))
             })
             .catch((error) => dealWithError(res, error))
+    }
+}
+
+function getPathsInUserFolder(username, address) {
+    return  {
+        from: `./${username}${address.from}`,
+        to: `./${username}${address.to}`,
     }
 }
 
